@@ -83,7 +83,7 @@ func main() {
 		for {
 			select {
 			case <-closer:
-				fmt.Println("---------- SUMMARY ----------")
+				fmt.Println("Execution summary:")
 				fmt.Printf("%d frames send\n", framesSend)
 				fmt.Printf("%d bytes written\n", bytesWritten)
 				fmt.Printf("Took a total time of %v\n", time.Since(startTime))
