@@ -10,7 +10,7 @@ With an properly configured Go toolchain execute the following.
 ```bash
 # on linux only
 go get github.com/davidkroell/mac-flooding
-cd $GOPATH/github.com/davidkroell/mac-flooding
+cd $GOPATH/src/github.com/davidkroell/mac-flooding
 
 go build -o flood main.go
 ```
