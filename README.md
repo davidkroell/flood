@@ -18,14 +18,15 @@ go build -o flood main.go
 ## Usage
 ```bash
 Usage of flood:
-  -i int
-    	Interface to send (default 1)
-  -l	List available interfaces
+  -i string
+    	Interface to send
   -n int
-    	Amount of ethernet frames send (default 1)
+    	Amount of frames send (default 1)
+  -s int
+    	Seed for source MAC address
   -t int
     	Number of threads to use (default 12)
-
+  -v	Print version
 ```
 
 ## Disclaimer
