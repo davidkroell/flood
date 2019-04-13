@@ -1,4 +1,4 @@
-module github.com/davidkroell/mac-flooding
+module github.com/davidkroell/flood
 
 require (
 	github.com/mdlayher/ethernet v0.0.0-20190313224307-5b5fc417d966
