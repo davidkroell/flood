@@ -29,8 +29,10 @@ var num = flag.Int("n", 1, "Amount of frames send")
 var ifaceName = flag.String("i", "", "Interface to send")
 var numThreads = flag.Int("t", 12, "Number of threads to use")
 var seed = flag.Int("s", 0, "Seed for source MAC address")
+var versionFlag = flag.Bool("v", false, "Print version")
 
 const etherType = 0xbeef
+const version = "flood v0.2.0"
 
 func main() {
 	flag.Parse()
@@ -128,6 +130,11 @@ func frameWriter(c net.PacketConn, ch <-chan *ethernet.Frame, stats chan<- int, 
 }
 
 func prerequisitesSatisfied() bool {
+	if *versionFlag {
+		fmt.Println(version)
+		return false
+	}
+
 	u, _ := user.Current()
 	if u.Uid != "0" {
 		fmt.Println("This program requires root (UID 0) access")

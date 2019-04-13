@@ -1,4 +1,4 @@
-# mac-flooding
+# flood
 Is a OSI layer 2 attack to take down a switch by filling the MAC-Address table.
 
 ## Requirements
