@@ -20,43 +20,34 @@ import (
 	"github.com/mdlayher/ethernet"
 	"github.com/mdlayher/raw"
 	"net"
+	"os/user"
 	"sync"
 	"time"
 )
 
-var num = flag.Int("n", 1, "Amount of ethernet frames send")
-var ifaceIndex = flag.Int("i", 1, "Interface to send")
-var listIfaces = flag.Bool("l", false, "List available interfaces")
+var num = flag.Int("n", 1, "Amount of frames send")
+var ifaceName = flag.String("i", "", "Interface to send")
 var numThreads = flag.Int("t", 12, "Number of threads to use")
+var seed = flag.Int("s", 0, "Seed for source MAC address")
 
 const etherType = 0xbeef
 
 func main() {
 	flag.Parse()
-
-	if *listIfaces {
-		ifaces, err := net.Interfaces()
-		if err != nil {
-			fmt.Println("Cannot access network interfaces: %v", err)
-		}
-
-		fmt.Println("Index\tName\tAddress")
-		format := "%d\t%s\t%s\n"
-
-		for _, iface := range ifaces {
-			fmt.Printf(format, iface.Index, iface.Name, iface.HardwareAddr)
-		}
+	if !prerequisitesSatisfied() {
 		return
 	}
 
-	iface, err := net.InterfaceByIndex(*ifaceIndex)
+	iface, err := net.InterfaceByName(*ifaceName)
 	if err != nil {
-		fmt.Printf("Cannot get interface: %v", err)
+		fmt.Println("No such network interface")
+		return
 	}
 
 	conn, err := raw.ListenPacket(iface, etherType, nil)
 	if err != nil {
 		fmt.Printf("cannot open connection: %v", err)
+		return
 	}
 
 	var wg sync.WaitGroup
@@ -90,8 +81,12 @@ func main() {
 	for i := 1; i <= *num; i++ {
 		f := &ethernet.Frame{
 			Destination: ethernet.Broadcast,
-			// hacky method for power to 2 numbers
-			Source:    net.HardwareAddr{0xde, 0xad, byte(i / (24 << 1)), uint8(i / (16 << 1)), uint8(i / (8 << 1)), uint8(i)},
+			Source: net.HardwareAddr{
+				byte(*seed),
+				0x00,
+				// hacky method for power to 2 numbers
+				byte(i / (24 << 1)), uint8(i / (16 << 1)), uint8(i / (8 << 1)), uint8(i),
+			},
 			EtherType: etherType,
 		}
 		ch <- f
@@ -130,4 +125,24 @@ func frameWriter(c net.PacketConn, ch <-chan *ethernet.Frame, stats chan<- int, 
 		stats <- n
 	}
 	doneCall()
+}
+
+func prerequisitesSatisfied() bool {
+	u, _ := user.Current()
+	if u.Uid != "0" {
+		fmt.Println("This program requires root (UID 0) access")
+		return false
+	}
+
+	// require iface index flag
+	if *ifaceName == "" {
+		flag.Usage()
+		return false
+	}
+
+	if *seed < 0 || *seed > 255 {
+		fmt.Printf("Seed (%d) must be between 0 and 255\n", *seed)
+		return false
+	}
+	return true
 }
