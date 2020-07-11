@@ -1,4 +1,4 @@
-//+build linux
+//+build linux darwin
 
 //Copyright (C) 2019  David Kröll
 //
