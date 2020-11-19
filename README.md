@@ -9,8 +9,8 @@ With an properly configured Go toolchain execute the following.
 
 ```bash
 # on linux only
-go get github.com/davidkroell/mac-flooding
-cd $GOPATH/src/github.com/davidkroell/mac-flooding
+go get github.com/davidkroell/flood
+cd $GOPATH/src/github.com/davidkroell/flood
 
 go build -o flood main.go
 ```
